@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>计算属性</title>
+		<script src="https://unpkg.com/vue"></script>
+	</head>
+	<body>
+		<p><b>这里我们声明了一个计算属性 reversedMessage 。</b></p>
+		<h5>我们提供的函数将用作属性 vm.reversedMessage 的getter</h5>
+		<div id="example-1">
+			<p>Original message:'{{ message }}'</p>
+			<p>Computed reversed messsage:'{{ reversedMessage }}'</p>
+		</div>
+		<script>
+			var example1 = new Vue({
+				el:'#example-1',
+				data:{
+					message:'Hello'
+				},
+				computed:{
+					//a computed getter
+					reversedMessage:function(){
+						return this.message.split('').reverse().join('');
+					}
+				}
+			})
+			
+		</script>
+		<p>*vm.reversedMessage依赖于vm.message,因此当vm.message发生改变时，所有依赖于vm.reversedMessage的绑定也会更新。</p>
+		<p><b>计算缓存vs Methods</b></p>
+		<h5>其实我们通过调用表达式中的method可以达到同样的效果。然而不同的是计算属性是基于它们的依赖进行缓存的。计算属性只有在它的相关依赖发生改变时才会重新求值。这就意味着只要message还没有发生改变，多次访问reversedMessage计算属性会立即返回之前的计算结果，而不必要再次执行函数。相比而言，只要发生重新渲染，method调用总会执行该函数。*如果不希望有缓存，请用method替代。</h5>
+		<div id="example-2">
+			<p>nowTime：{{now}}</p>
+		</div>
+		<script>
+			var example2 = new Vue({
+				el:"#example-2",
+				computed:{
+					now:function(){
+						return new Date();
+					}
+				}
+			})
+		</script>
+		<p><b>计算setter：计算属性默认只有getter，需要是可以提供一个setter</b></p>
+		<div id="example-3">
+			<p>{{fullName}}</p>
+		</div>
+		<script>
+			var example3 = new Vue({
+				el:'#example-3',
+				data:{
+					firstName:'Tom',
+					lastName:'shan',
+					fullName:'shan Tom'
+				},
+				computed:{
+					//getter
+					get:function(){
+						return this.firstName + ' ' + this.lastName 
+					},
+					//setter
+					set:function(newValue){
+						var names = newValue.split(' ');
+						this.firstName = names[0]
+						this.lastName = names[name.length-1]
+					}
+				}
+			})
+		</script>
+	</body>
+</html>
