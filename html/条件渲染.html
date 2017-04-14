@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>条件渲染</title>
+		<script src="https://unpkg.com/vue"></script>
+	</head>
+	<body>
+		<p>#<b style="color:orange">v-if</b>和<b style="color:orange">v-else</b></p>
+		<div id="app-1">
+			<div v-if="show">Now you see me</div>
+			<div v-else>Now you don't</div>
+			<template v-if="show">
+				<h1>Title</h1>
+				<p>Paragraph 1</p>
+				<p>Paragraph 2</p>
+			</template>
+		</div>
+		<script>
+			var app1 = new Vue({
+				el:"#app-1",
+				data:{
+					show:Math.random() > 0.5
+				}
+			})
+		</script>
+		<p><span style="color:red">*注意：v-else元素必须紧紧跟在v-if或者v-else-if元素后面，否则它将不会被识别。</span></p>
+		<p>#<b><span style="color:orange">v-else-if</span>，顾名思义，充当v-if的"else-if块"。可以链式地使用多次：</b></p>
+		<div id="app-2">
+			<div v-if="type === 'A'">A</div>
+			<div v-else-if="type === 'B'">B</div>
+			<div v-else-if="type === 'C'">C</div>
+			<div v-else>Not A/B/C</div>
+		</div>
+		<script>
+			var app2 = new Vue({
+				el:"#app-2",
+				data:{
+					type:"A"
+				}
+			})
+		</script>
+		<p><span style="color:red">*注意：v-else-if必须紧跟在v-if或者v-else-if元素之后</span></p>
+		<p>#<b>用<span style="color:orange">key</span>管理可复用的元素,声明“这两个元素是完全独立的--不要复用它们”，只需添加一个具有唯一值得<span style="color:orange">key</span>属性即可</b></p>
+		<p>自己动手试一试，在输入框中输入一些文本，然后按下切换按钮：</p>
+		<div id="app-3">
+			<template v-if="loginType === 'username'">
+				<label>Username</label>
+				<input placeholder="Enter your username">
+			</template>
+			<template v-else>
+				<label>Email</label>
+				<input placeholder="Enter your email address">
+			</template>
+			<button v-on:click="toggleLogintype">Toggle login type</button>
+		</div>
+		<script>
+			var app3 = new Vue({
+				el:"#app-3",
+				data:{
+					loginType:"username"
+				},
+				methods:{
+					toggleLogintype:function(){
+						return this.loginType == "username" ? this.loginType = "Email" : this.loginType = "username";
+					}
+				}
+			})
+		</script>
+		<p>点击切换发现已经输入的内容不会被清空，这是因为两个模版使用了相同的元素，input不会被替换掉--仅仅是替换了它的placeholder</p>
+		<p>如果你你希望切换的时候内容也可以自动清空，只需要添加一个具有唯一值的<span style="color:orange">key</span>属性即可，再试试</p>
+		<div id="app-4">
+			<template v-if="loginType === 'username'">
+				<label>Username</label>
+				<input placeholder="Enter your username" key="username-input" />
+			</template>
+			<template v-else>
+				<label>Email</label>
+				<input placeholder="Enter your email address" key="email-input" />
+			</template>
+			<button v-on:click="toggleLogintype">Toggle login type</button>
+		</div>
+		<script>
+			var app4 = new Vue({
+				el:"#app-4",
+				data:{
+					loginType:"username"
+				},
+				methods:{
+					toggleLogintype:function(){
+						return this.loginType == "username" ? this.loginType = "Email" : this.loginType = "username";
+					}
+				}
+			})
+		</script>
+		<p><span style="color:red">*注意，<b style="color:orange">label</b>元素仍然会被高效的复用，因为它们没有添加<b style="color:orange">key</b>属性</span></p>
+	</body>
+	
+</html>

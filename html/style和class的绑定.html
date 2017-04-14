@@ -2,8 +2,140 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title></title>
+		<title>style和class的绑定</title>
+		<script src="https://unpkg.com/vue"></script>
 	</head>
 	<body>
+		<p><b>绑定HTML Class</b></p>
+		<h5>#对象语法：我们可以传给<span style="color:orange">v-bind:class</span>一个对象，以动态的切换class</h5>
+		<div id="app-1" v-bind:class='{active:isActive}'>当isActive=true时我就拥有了active属性</div>
+		<script>
+			var app1 = new Vue({
+				el:"#app-1",
+				data:{
+					isActive:true
+				}
+			})
+		</script>
+		<h5>*对象中可以传入更多属性来动态切换多个class。此外，v-bind：class指令可以与普通的class属性共存。如下模版：</h5>
+		<div id="app-2" class="static" v-bind:class="{active:isActive,'text-danger':hasError}">我不仅有static属性还有active属性。</div>
+		<script>
+			var app2 = new Vue({
+				el:"#app-2",
+				data:{
+					isActive:true,
+					hasError:false
+				}
+			})
+		</script>
+		<div>当isActive 或者hasError变化时，class列表将相应地更新。例如，如果hasError的值为true，class列表将变为'static active text-danger'。</div>
+		<h5>*除了直接绑定一个对象，还可以绑定数据里的一个对象，常用且强大的模式是绑定返回对象的计算属性。</h5>
+		<div id="app-3" v-bind:class="classObject">例1.我的属性绑定在数据里的classObject对象上，效果与上面绑定方式的相同</div>
+		<script>
+			var app3 = new Vue({
+				el:"#app-3",
+				data:{
+					classObject:{
+						active:true,
+						'text-danger':true
+					}
+				}
+			})
+		</script>
+		<div id="app-4" v-bind:class="classObject">例2.我的属性绑定在返回对象的计算属性上</div>
+		<script>
+			var app4 = new Vue({
+				el:"#app-4",
+				data:{
+					isActive:true,
+					error:null
+				},
+				computed:{
+					classObject:function(){
+						return {
+							active:this.isActive && !this.error,
+							'text-danger':this.error && this.error.type === 'fatal'
+						}
+					}
+				}
+			})
+		</script>
+		<h5>#数组语法：我们可以把一个数组传给<span style="color:orange">v-bind:class</span>，以应用一个class列表：</h5>
+		<div id="app-5" v-bind:class="[activeClass,errorClass]">我的属性是有一个数组传入的</div>
+		<script>
+			var app5 = new Vue({
+				el:'#app-5',
+				data:{
+					activeClass:'active',
+					errorClass:'text-danger'
+				}
+			})
+		</script>
+		<h5>利用三元表达式根据条件切换列表中的class</h5>
+		<div id="app-6" v-bind:class="[isActive?activeClass:'',errorClass]">三元表达式切换class，此例始终添加errorClass，但是只是在isActive是true时添加activeClass</div>
+		<script>
+			var app6 = new Vue({
+				el:"#app-6",
+				data:{
+					isActive:true,
+					activeClass:'active',
+					errorClass:'text-danger'
+				}
+			})
+		</script>
+		<h5>当有多个条件class时用三元表达式显得有些繁琐，可以在数组语法中使用对象语法</h5>
+		<div id="app-7" v-bind:class="[{active:isActive},errorClass]">我的class属性是结合数组语法和对象属性写入的</div>
+		<script>
+			var app7 = new Vue({
+				el:"#app-7",
+				data:{
+					isActive:false,
+					errorClass:'text-danger'
+				}
+			})
+		</script>
+		<p><b>绑定内联样式</b></p>
+		<h5>#对象语法</h5>
+		<div id="app-8" v-bind:style="{color:activeColor,fontSize:fontSize + 'px'}">我的字体颜色和字号是通过对象语法绑定内联样式设置的</div>
+		<script>
+			var app8 = new Vue({
+				el:"#app-8",
+				data:{
+					activeColor:'green',
+					fontSize:'28'
+				}
+			})
+		</script>
+		<h5>直接绑定到一个样式对象通常更好，让模板更清晰，同样的对象语法常常结合返回对象的计算属性使用</h5>
+		<div id="app-9" v-bind:style="styleObject">我的样式是直接绑定到一个样式对象上的</div>
+		<script>
+			var app9 = new Vue({
+				el:"#app-9",
+				data:{
+					styleObject:{
+						color:'red',
+						fontSize:'16px'
+					}
+				}
+			})
+		</script>
+		<h5>#数组语法</h5>
+		<p><span style="color:orange">v-bind:style</span>的数组语法可以将多个样式对象应用到一个元素上</p>
+		<div id="app-10" v-bind:style="[baseStyles,overridingStyles]">我的样式是用数组语法将两个样式对象（baseStyles,overridingStyles）同时应用的结果</div>
+		<script>
+			var app10 = new Vue({
+				el:"#app-10",
+				data:{
+					baseStyles:{
+						color:"blue",
+						fontSize:"14px"
+					},
+					overridingStyles:{
+						fontWeight:"bold",
+						textDecoration:"underline"
+					}
+				}
+			})
+		</script>
 	</body>
 </html>
