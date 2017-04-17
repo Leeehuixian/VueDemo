@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>列表渲染</title>
+		<script src="https://unpkg.com/vue"></script>
+	</head>
+	<body>
+		<p><b style="color:orange">v-for</b></p>
+		<p>我们用<span style="color:orange">v-if</span>指令根据一组数组的选项列表进行渲染。<span style="color:orange">v-for</span>指令需要以<span style="color:orange">item in items</span>形式的特殊语法，<span style="color:orange">items</span>是源数据数组并且<span style="color:orange">item</span>是数组元素迭代的别名。</p>
+		<p><b>#基本用法</b></p>
+		<ul id="example-1">
+			<li v-for="item in items">{{item.message}}</li>
+		</ul>
+		<script>
+			var example1 = new Vue({
+				el:"#example-1",
+				data:{
+					items:[
+						{message:'Foo'},
+						{message:'Bar'}
+					]
+				}
+			})
+		</script>
+		<p>在<span style="color:orange">v-for</span>块中，我们拥有对父作用域属性完全访问权限。<span style="color:orange">v-for</span>还支持一个可选的第二参数为当前项的索引。</p>
+		<ul id="example-2">
+			<li v-for="(item,$index) in items" >{{parentMessage}}-{{$index}}-{{item.message}}</li>
+		</ul>
+		<script>
+			var example2 = new Vue({
+				el:"#example-2",
+				data:{
+					parentMessage:'Parent',
+					items:[
+						{message:"Jone"},
+						{message:"Tom"}
+					]
+				}
+			})
+		</script>
+		<p><b>#Template v-for</b></p>
+		<p>用带有v-for的&lt;template&gt;标签来渲染多个元素块。例如：</p>
+		<ul id="example-3">
+			<template v-for="(item,index) in items">
+				<li>{{ item.msg }}</li>
+				<li class="divider">{{ index }}</li>
+			</template>
+		</ul>
+		<script>
+			var example3 = new Vue({
+				el:"#example-3",
+				data:{
+					items:[
+						{msg:"apple"},
+						{msg:"orange"},
+						{msg:"watermelon"}
+					]
+				}
+			})
+		</script>
+		<p><b>#对象迭代v-for</b></p>
+		<p>用<span style="color:orange">v-for</span>通过一个对象的属性来迭代,第二个参数为键名，第三个参数为索引</p>
+		<ul id="example-4">
+			<li v-for="(value,key,index) in object">{{index}}:{{ key }}:{{ value }}</li>
+		</ul>
+		<script>
+			var example4 = new Vue({
+				el:"#example-4",
+				data:{
+					object:{
+						FirstName:'John',
+						LastName:'Doe',
+						Age:30
+					}
+				}
+			})
+		</script>
+		<p><b>#整数迭代v-for，<span style="color:orange">v-for</span>也可以取整数。在这种情况下，它将重复多次模板。</b></p>
+		<div id="example-5">
+			<span v-for="n in 10">{{ n }} &nbsp;</span>
+		</div>
+		<script>
+			var example5 = new Vue({
+				el:"#example-5",
+			})
+		</script>
+		<p><b>Key</b></p>
+		<p>为了给Vue一个提示，以便它能跟踪每个节点的身份，从而重用和重新排序现有元素，你需要为每项提供一个唯一的<span style="color:orange">key</span>属性。理想的<span style="color:orange">key</span>值是每项都有一个唯一id。这个特殊的属性相当于Vue1.x的<span style="color:orange">track-by</span>，但它的工作方式类似于一个属性，所以你需要用v-bind来绑定动态值，可简写为<span style="color:orange">:key="XXX"</span></p>
+		<ul id="example-6">
+			<li v-for="item in items" :key="item.id">我的id是{{ item.id }}</li>
+		</ul>
+		<script>
+			var example6 = new Vue({
+				el:"#example-6",
+				data:{
+					items:[
+						{id:"NO.1"},
+						{id:"NO.2"},
+						{id:"NO.3"}
+					]
+				}
+			})
+		</script>
+		<p><b>数组更新检测</b></p>
+		<h5>#变异方法，会改变原始数组，将会触发视图更新。这些方法如下：</h5>
+		<ul>
+			<li style="color:orange">push()</li>
+			<li style="color:orange">pop()</li>
+			<li style="color:orange">shift()</li>
+			<li style="color:orange">unshift()</li>
+			<li style="color:orange">splice()</li>
+			<li style="color:orange">sort()</li>
+			<li style="color:orange">reverse()</li>
+		</ul>
+		<h5>#重塑数组</h5>
+		<p>不会改变原始数组，但总是返回一个新数组。当使用非变异方法时，可以用新数组替换旧数组。这些方法如下：</p>
+		<ul>
+			<li style="color:orange">filter()</li>
+			<li style="color:orange">concat()</li>
+			<li style="color:orange">slice()</li>
+		</ul>
+		<p><b>#注意事项</b></p>
+		<p>由于Javascript的限制，Vue不能检测一下变动的数组：</p>
+		<ol>
+			<li>当你利用索引直接设置一个项时，例如：<span style="color:orange">vm.items[indexOfItem] = newValue</span></li>
+			<li>当你修改数组的长度时，例如：<span style="color:orange">vm.items.length = newLength</span></li>
+		</ol>
+		<p>为解决第一类问题，以下两种方式都可以实现和<span style="color:orange">vm.items[indexOfItem] = newValue</span>相同的效果，同时也将触发状态更新：</p>
+		<ol>
+			<li>//Vue.set<br/>Vue.set(example.items,indexOfItem,newValue)</li>
+			<li>//Array.prototype.splice<br/>example1.items.splice(indexOfItem,1,newValue)</li>
+		</ol>
+		<p>为了解决第二类问题，你也同样可以使用<span style="color:orange">splice:</span></p>
+		<p>example1.items.splice(newLength)</p>
+		<p><b>显示过滤/排序结果</b></p>
+		<p>#如果要显示一个数组的过滤或排序副本，而不实际改变或重置原始数组，可以创建返回过滤或排序数组的计算属性。</p>
+		<ul id="example-7">
+			<li v-for="n in evenNumbers">{{ n }}</li>
+		</ul>
+		<script>
+			var example7 = new Vue({
+				el:"#example-7",
+				data:{
+					numbers:[1,2,3,4,5]
+				},
+				computed:{
+					evenNumbers:function(){
+						return this.numbers.filter(function(number){
+							return number % 2 === 0
+						})
+					}
+				}
+			})
+		</script>
+		<p>#计算属性不适用的情况下（例如，在嵌套v-for 循环中）使用method方法</p>
+		<ul id="example-8">
+			<li v-for="n in even(numbers)">{{ n }}</li>
+		</ul>
+		<script>
+			var example8 = new Vue({
+				el:"#example-8",
+				data:{
+					numbers:[6,7,8,9]
+				},
+				methods:{
+					even:function(numbers){
+						return numbers.filter(function(number){
+							return number % 2 === 0
+						})
+					}
+				}
+			})
+		</script>
+	</body>
+</html>
