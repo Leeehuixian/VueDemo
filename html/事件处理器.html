@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>事件处理器</title>
+		<script src="https://unpkg.com/vue"></script>
+	</head>
+	<body>
+		<p><b>监听事件</b></p>
+		<p>可以用<b style="color:orange">v-on</b>指令监听DOM事件来触发一些Javascript代码</p>
+		<div id="app-1">
+			<button v-on:click="counter += 1">增加1</button>
+			<p>此按钮被点击了{{ counter }}次</p>
+		</div>
+		<script>
+			var app1 = new Vue({
+				el:"#app-1",
+				data:{
+					counter:0
+				}
+			})
+		</script>
+		<p><b>方法事件处理器</b></p>
+		<p>许多事件处理的逻辑都很复杂，所以直接把Javascript代码写在<b style="color:orange">v-on</b>指令中是不可行的。因此<b style="color:orange">v-on</b>可以接收一个定义的方法来调用。</p>
+		<div id="app-2">
+			<p>&lt;!--'greet'是在Vue实例中定义的方法名--&gt;</p>
+			<button v-on:click="greet">Greet</button>
+		</div>
+		<script>
+			var app2 = new Vue({
+				el:"#app-2",
+				data:{
+					name:"Vue.js"
+				},
+				//在'methods'对象中定义方法
+				methods:{
+					greet:function(event){
+						//'this'在方法里指当前Vue实例
+						alert('Hello ' + this.name + '!');
+						//'event'是原生DOM事件
+						alert(event.target.tagName);
+					}
+				}
+			})
+			
+			//也可以用Javascript直接调用方法
+//			app2.greet() //——>'Hello Vue.js!'
+		</script>
+		<p><b>内联处理器方法</b></p>
+		<p>除了直接绑定到一个方法，也可以用内联Javascript语句：</p>
+		<div id="app-3">
+			<button v-on:click="say('hi')">Say hi</button>
+			<button v-on:click="say('what')">Say what</button>
+		</div>
+		<script>
+			var app3 = new Vue({
+				el:"#app-3",
+				methods:{
+					say:function(message){
+						alert(message);
+					}
+				}
+			})
+		</script>
+		<p>有时需要在内联语句中访问原生DOM事件。可以用特殊变量$event把它传入方法</p>
+		<button id="app-4" v-on:click="warn('Form cannot be submitted yet.',$event)">Submit</button>
+		<script>
+			var app4 = new Vue({
+				el:"#app-4",
+				methods:{
+					warn:function(message,event){
+						//现在我们可以访问原生事件对象
+						if(event) event.preventDefault();
+						alert(message);
+					}
+				}
+			})
+		</script>
+		<p><b>事件修饰符</b></p>
+		<p>Vue.js为<b style="color:orange">v-on</b>提供了事件修饰符。通过由点（.）表示的指令后缀来调用修饰符。</p>
+		<ul>
+			<li style="color:orange">.stop&nbsp;&nbsp;&nbsp;<span style="color:#999">v-on:click.stop = "doThis"//阻止单击事件冒泡</span></li>
+			<li style="color:orange">.prevent&nbsp;&nbsp;&nbsp;<span style="color:#999">v-on:submit.prevent = "onSubmit"//提交事件不再重载页面</span></li>
+			<li style="color:orange">.capture&nbsp;&nbsp;&nbsp;<span style="color:#999">v-on:click.capture = "doThis"//添加事件侦听器时使用事件捕获模式</span></li>
+			<li style="color:orange">.self&nbsp;&nbsp;&nbsp;<span style="color:#999">v-on:click.self = "doThis"//只有当事件在该元素本身（而不是子元素）触发时触发回调</span></li>
+			<li style="color:orange">.once&nbsp;&nbsp;&nbsp;<span style="color:#999">v-on:click.once = "doThis"//点击事件将只会触发一次</span></li>
+		</ul>
+		<!--修饰符可以串联：v-on:click.stop.prevent = "doThat"-->
+		<!---只有修饰符：v-on:click.submit.prevent-->
+		
+		<p><b>按键修饰符</b></p>
+		<p>在监听键盘事件时，我们经常需要监测常见的键值。Vue允许为<b style="color:orange">v-on</b>在监听键盘事件时添加按键修饰符</p>
+		<!--只有在按下空格键时调用-->
+		<div id="app-5">
+			<input v-on:keyup.space="warn('输入空格无效')" placeholder="输入空格试试" />
+		</div>
+		<!--缩写语法<input @keyup.space="warn('输入空格无效')"/>-->
+		<script>
+			var app5 = new Vue({
+				el:"#app-5",
+				methods:{
+					warn:function(messsage){
+						alert(messsage);
+					}
+				}
+			})
+		</script>
+		<p>keyCode比较难记，所以Vue为最常用的按键名提供了别名：</p>
+		<ul>
+			<li style="color:orange">.enter</li>
+			<li style="color:orange">.tab</li>
+			<li style="color:orange">.delete(捕获“删除”和“退格”键)</li>
+			<li style="color:orange">.esc</li>
+			<li style="color:orange">.space</li>
+			<li style="color:orange">.up</li>
+			<li style="color:orange">.down</li>
+			<li style="color:orange">.left</li>
+			<li style="color:orange">.right</li>
+			<li style="color:orange">.ctrl</li>
+			<li style="color:orange">.alt</li>
+			<li style="color:orange">.shift</li>
+			<li style="color:orange">.meta</li>
+		</ul>
+		<p>可以通过全局<span style="color:orange">config.keyCode</span>对象自定义按键修饰符别名：</p>
+		<p>//可以使用v-on:keyup.f1</p>
+		<p>Vue.config.keyCodes.f1 = 112</p>
+	</body>
+</html>
