@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>组件</title>
+		<script src="https://unpkg.com/vue"></script>
+	</head>
+	<body>
+		<P><b>Vue组件的使用有3个步骤，1、创建组件构造器，2、注册组件，3、使用组件。</b></P>
+		<p>代码演示如下：</p>
+		<div id="app">
+			<!-- 3.#app是Vue实例挂载的元素，应该在挂载元素范围内使用组件-->
+			<my-component></my-component>
+		</div>
+		<script>
+			//1.创建一个组件构造器
+			var myComponent = Vue.extend({
+				template:'<div>This is my first component!</div>'
+			})
+			
+			//2.注册组件，并指定组件的标签，组件的HTML标签为<my-component>
+			Vue.component('my-component',myComponent)
+			
+			//创建Vue实例#app
+			new Vue({
+				el:"#app"
+			});
+		</script>
+		<p><b>理解组件的创建和注册</b></p>
+		<p>我们用以下几个步骤来理解组件的创建和注册</p>
+		<ol>
+			<li>Vue.extend()是Vue构造器的扩展，调用Vue.extend()创建的是一个组件构造器，而不是具体的组件实例。</li>
+			<li>Vue.extend()构造器有一个选项对象，选项对象的template属性用于定义组件要渲染的HTML。</li>
+			<li>使用Vue.component()注册组件时，需要提供2个参数，第1个参数是组件的标签，第2个参数是组件构造器。</li>
+			<li>Vue.component()方法内部会调用组件构造器，创建一个组件实例。</li>
+			<li>组件应该挂载到某个Vue实例下，否则它不会生效。</li>
+		</ol>
+		<p style="color:orange">请注意第5点，以下代码在3个地方使用了<my-component>标签，但只有#app1和#app2下的<my-component>标签才起到作用。</p>
+		<div id="app1">
+			<my-component></my-component>
+		</div>
+		<div id="app2">
+			<my-component></my-component>
+		</div>
+		<!--该组件不会被渲染-->
+		<my-component></my-component>
+		<script>
+			var myComponent = Vue.extend({
+				template:'<div>This is a component!</div>'
+			})
+			Vue.component('my-component',myComponent)
+			var app1 = new Vue({
+				el:"#app1"
+			})
+			var app2 = new Vue({
+				el:"#app2"
+			})
+		</script>
+		<p><b>全局注册和局部注册</b></p>
+		<p>调用Vue.component()注册组件时，组件的注册是全局的，这意味着该组件可以在任意Vue实例下使用。如果不需要全局注册，或者是让组件使用在其它组件内，可以用选项对象的components属性实现局部注册。</p>
+		<h5>全局注册</h5>
+		<div id="example">
+			<!--3.在组件内使用-->
+			<custom-component></custom-component>
+		</div>
+		<div id="example2">
+			<custom-component></custom-component>
+		</div>
+		<script>
+			//1.创建组件构造器
+			var customComponent = Vue.extend({
+				template:'<div>A custom component!</div>',
+				replace:false//?为什么不能阻止替换自定义元素
+			})
+			//2.将custom-component注册为全局组件
+			Vue.component('custom-component',customComponent);
+			//创建根实例
+			var example = new Vue({
+				el:"#example",
+			})
+			var example2 = new Vue({
+				el:"#example2",
+			})
+		</script>
+		<h5>局部注册</h5>
+		<div id="example3">
+			<!--3.topical-component只能在#example3下使用-->
+			<topical-component></topical-component>
+		</div>
+		<p style="color:orange">由于topical-component组件是注册在#example3元素对应的Vue实例下的，所以它不能在其他Vue实例下使用</p>
+		<div id="example4">
+			<!--不能使用topical-component组件，因为topical-component是一个局部组件它属于#example3-->
+			<topical-component></topical-component>
+		</div>
+		<script>
+			//1.创建一个组件构造器
+			var topicalComponent = Vue.extend({
+				template:'<div>This is a topical component!</div>'
+			})
+			new Vue({
+				el:"#example3",
+				components:{
+					//2.将topical-component组件注册到#example3实例下
+					'topical-component':topicalComponent
+				}
+			});
+			new Vue({
+				el:"#example4"
+			});
+		</script>
+		<h5>一个更加生动的局部注册的例子</h5>
+		<div id="app-1">
+			<didi-component></didi-component>
+		</div>
+		<script>
+			var Child = Vue.extend({
+				template:'<span>I am child!</span>',
+				replace:true
+			});
+			var Parent = Vue.extend({
+				template:'<p>I am parent!<br/><child></child></p>',
+				components:{
+					// child 只能用在父组件模版内
+					'child':Child
+				}
+			});
+			//创建根实例
+			var app1 = new Vue({
+				el:'#app-1',
+				components:{
+					'didi-component':Parent
+				}
+			})
+		</script>
+	</body>
+</html>
