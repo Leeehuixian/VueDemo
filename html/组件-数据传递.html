@@ -2,8 +2,103 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title></title>
+		<title>组件之间的数据传递</title>
+		<script src="https://unpkg.com/vue"></script>
 	</head>
 	<body>
+		<p>Vue.js组件之间有三种数据传递方式：</p>
+		<ul>
+			<li>props</li>
+			<li>组件通信</li>
+			<li>slot</li>
+		</ul>
+		<p><b>1.props</b></p>
+		<p>组件的作用域是孤立的，所以子组件需要显式地用props选项来获取父组件的数据。props选项可以是字面量，也可以是表达式，还可以绑定修饰符。</p>
+		<h5>（1）字面量语法</h5>
+		<div id="app1">
+			<!--向它传入一个普通的字符串-->
+			<child msg="hello"></child>
+		</div>
+		<script>
+			var Child = Vue.extend({
+				//声明props
+				props:['msg'],
+				//prop可以用在模板内，可以用'this.msg'设置
+				template:'<span>{{ msg }},DDEE!</span>'
+			})
+			new Vue({
+				el:"#app1",
+				components:{
+					'child':Child
+				}
+			})
+		</script>
+		<p style="color:orange">HTML特性不区分大小写。名字形式为camlCase的props用作特性时，需要转换为kebab-case形式（短横线隔开）。</p>
+		<div id="app2">
+			<!--如果这里写成'myMsg',将会在收到这样的警告：use "my-msg" instead of "myMsg".-->
+			<child-component my-msg='hi'></child-component>
+		</div>
+		<script>
+			var childComponent = Vue.extend({
+				props:['myMsg'],
+				template:'<span>{{ myMsg }},I am Kebab-case</span>'
+			});
+			new Vue({
+				el:"#app2",
+				components:{
+					'child-component':childComponent
+				}
+			})
+		</script>
+		<h5>（2）动态语法</h5>
+		<p>类似于用v-bind将HTML特性绑定到一个表达式，我们也可以用v-bind将动态props绑定到父组件的数据。每当父组件的数据变化时，该变化也会传导给子组件。</p>
+		<div id="app3">
+			<input v-model="parentMsg" />
+			<br />
+			<child :my-message="parentMsg"></child>
+		</div>
+		<script>
+			var Child = Vue.extend({
+				props:['myMessage'],
+				template:'<p>{{ myMessage }}</p>',
+			})
+			new Vue({
+				el:'#app3',
+				data:function(){
+					return {parentMsg:'input someting to try'}
+				},
+				components:{
+					'child':Child
+				}
+			})
+		</script>
+		<h5>（3）绑定修饰符</h5>
+		<ul>
+			<li>.sync，双向绑定</li>
+			<li>.once，单次绑定</li>
+		</ul>
+		<p style="color:orange"></p>
+		<div id="app4">
+			<input type="text" v-model="info.name"/>
+			<child :msg.once="info"></child>
+		</div>
+		<script>
+			new Vue({
+				el:"#app4",
+				data:function(){
+					return{
+						info:{
+							name:'顺风车'
+						}
+					}
+				},
+				components:{
+					'child':{
+						props:['msg'],
+						template:'<div>{{msg.name}} DDFamily!</div>'
+					}
+				}
+			})
+		</script>
 	</body>
 </html>
