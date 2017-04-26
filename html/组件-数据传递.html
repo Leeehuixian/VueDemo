@@ -78,6 +78,7 @@
 			<li>.once，单次绑定</li>
 		</ul>
 		<p style="color:orange"></p>
+		<!--单次绑定-->
 		<div id="app4">
 			<input type="text" v-model="info.name"/>
 			<child :msg.once="info"></child>
@@ -96,6 +97,25 @@
 					'child':{
 						props:['msg'],
 						template:'<div>{{msg.name}} DDFamily!</div>'
+					}
+				}
+			})
+		</script>
+		<h5>双向绑定:效果是无论你改哪一个的值，另外一个都会随之改变</h5>
+		<div id="app5">
+			<input v-model="val" />
+			<test :test="val"></test>
+		</div>
+		<script>
+			new Vue({
+				el:"#app5",
+				data:{
+					val:1
+				},
+				components:{
+					test:{
+						props:["test"],
+						template:"<input v-model='test' />"
 					}
 				}
 			})
