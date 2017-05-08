@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>组件-组件通信（非vuex法）</title>
+		<script src="https://unpkg.com/vue"></script>
+	</head>
+	<body>
+		<p style="color:deeppink">写在前面：</p>
+		<p>1.父组件的data写法与子组件的data写法不同</p>
+		<p style="color:darkgreen">//父组件</p>
+		<p>
+			data:{//对象形式}
+		</p>
+		<p style="color:darkgreen">//子组件</p>
+		<p>
+			data:function(){
+				return {//函数形式}
+			}
+		</p>
+		<p>2.引用子组件遵循</p>
+		<ul>
+			<li>引入组件</li>
+			<li>components里定义使用</li>
+			<li>如果有通信，需要在子组件的props注册</li>
+		</ul>
+		<!--一下实例全部使用以下模板-->
+		<div id="app">
+			<!--父组件-->
+			<p>{{ total }}</p>
+			<input v-model="total" />
+			<mime @increment="incrementTotal" ref="child" :num-a="total" num-s="total"></mime>
+			<button type="button" @click="clickref">调用子组件</button>
+		</div>
+		<!--子组件-->
+		<template id="myInput">
+			<button @click="add">{{ counter }}</button>
+		</template>
+		<script>
+			new Vue({
+				el:"#app",
+				data:{
+					total:0
+				},
+				methods:{
+					incrementTotal:function(){
+						this.total += 1;
+					},
+					clickref:function(){
+						var child = this.$refs.childs;//获取子组件实例
+						child.counter = 45;//改变子组件数据
+						child.add(11);//调用子组件方法add
+					}
+				},
+				components:{
+					"mime":{
+						template:"#myInput",
+						data:function(){
+							return{
+								counter:0
+							}
+						},
+						props:["numA","numS"],
+						methods:{
+							add:function(num){
+								this.counter +=1;
+								this.$emit("increment");//子组件通过$emit触发父组件的方法increment 还可以传参this.$emit("increment",this.counter);
+								console.log("接受父组件的值:",num)//num为11
+							}
+						}
+					}
+				}
+			})
+		</script>
+		<h5 style="color:deeppink">1.父子通信之静态数据</h5>
+		<p>如果只是传单一的字符串</p>
+		<!--
+			<minme num-s="total"></minme>
+			……
+			props:["numS"]//numS为字符串total
+			这样子组件的numS一直为total。但这种不太灵活
+		-->
+		<h5 style="color:deeppink">2.父子通信之动态数据</h5>
+		<p>父组件的数据将会动态传递给子组件</p>
+		<!--
+			<input v-model="total"/>
+			<mime :num-a="total"></mime>
+			……
+			//props:['numA']
+			props:{
+				numA:[String,Number]//允许字符串 数字
+			}
+		-->
+		<h5 style="color:deeppink">3.父子通信之子调用父</h5>
+		<p>子组件执行add->触发$emit——>触发父组件increment——>执行incrementTotal方法</p>
+		<!--
+			methods:{
+				incrementTotal:function(){
+					this.total += 1;
+				}
+			}
+			……
+			components:{
+				data:function(){
+					return:{
+						counter:0
+					}
+				},
+				methods:{
+					add:function(){
+						this.counter +=1；
+						this.$emit("increment");//子组件通过$emit触发父组件的方法increment 还可以传参this.$emit("increment",this.counter);
+					}
+				}
+			}
+		-->
+		<h5 style="color:deeppink">4.父子通信之父调用子<b style="color:orange"> 试验失败，需要深入学习</b></h5>
+		<p>通过在子组件上引用ref，从而获得子组件实例，进行相应操作</p>
+		<!--
+			<script>
+				……
+				methods:{
+					clickref:funciton(){
+						var child = this.$refs.childs;//获取子组件实例
+						child.counter = 45;//改变子组件数据
+						child.add(11);//调用子组件方法add
+					}
+				},
+				components:{
+					data:function(){
+						return:{
+							counter:0
+						}
+					},
+					methods:{
+						add:function(num){
+							this.counter +=1;
+							console.log("接受父组件的值:",num)//num为11
+						}
+					}
+				}
+				
+			</script>
+		-->
+		<h5 style="color:deeppink">5.子组件与子组件通信</h5>
+		<p>官网：在简单的场景下，使用一个空的Vue实例作为中央事件总线，但是这样相当麻烦，建议使用vuex</p>
+		<!--
+			var bus = new Vue();
+			//触发组件A中的事件
+			bus.$emit('id-selected',1)
+			//在组件B创建的钩子中监听事件
+			bus.$on('id-selected',function(id){
+				//...
+			})
+		-->
+		<h5 style="color:deeppink">使用v-on绑定自定义事件</h5>
+		<p>！不能用$on侦听子组件抛出的事件，而必须在模板里直接用v-on绑定，就像以下的例子：</p>
+		<div id="counter-event-example">
+			<p>{{ total }}</p>
+			<button-counter @increment="incrementTotal"></button-counter>
+			<button-counter @increment="incrementTotal"></button-counter>
+		</div>
+		<script>
+			new Vue({
+				el:"#counter-event-example",
+				data:{
+					total:0
+				},
+				components:{
+					"button-counter":{
+						template:'<button @click="increment">{{ counter }}</button>',
+						data:function(){
+							return{
+								counter:0
+							}
+						},
+						methods:{
+							increment:function(){
+								this.counter += 1;
+								this.$emit('increment')
+							}
+						}
+					}
+				},
+				methods:{
+					incrementTotal:function(){
+						this.total += 1;
+					}
+				}
+			})
+		</script>
+	</body>
+</html>

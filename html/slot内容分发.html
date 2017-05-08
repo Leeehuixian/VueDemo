@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>slot内容分发</title>
+		<script src="https://unpkg.com/vue"></script>
+	</head>
+	<body>
+		<p>定义：vue.js内容分发把组件上下文的内容注入到组件。</p>
+		<p>定义解析：现在我们看一个架空的例子，假设有一个组件名为my-component，其使用上下文如下：</p>
+		<div class="" id="app">
+			<my-component>
+				<p>hi,slots</p>
+			</my-component>
+		</div>
+		<script>
+			new Vue({
+				el:"#app",
+				components:{
+					'my-component':{
+						template:'<div><slot>只有当没有分发内容时显示</slot></div>'
+					}
+				}
+			})
+		</script>
+		<p style='color:orange'>标签&lt;slot&gt;会把组件使用上下文的内荣注入到此标签所占据的位置上,而slot标签的内容将会被注入的内容取代，如果没有slot标签那么p标签及内容将会被丢弃。组件分发的概念简单而强大，因为它意味着对一个隔离的组件除了通过属性、时间交互之外，还可以注入内容</p>
+		<p><b>命名插槽</b>：可以把上下文内的内容分成多个有名字的部分，然后插入到组件的不同位置：</p>
+		<div class="" id="app2">
+			<my-component>
+				<p slot="slot1">hi,slot1</p>
+				<p slot="slot2">hi,slot2</p>
+			</my-component>
+		</div>
+		<script>
+			new Vue({
+				el:"#app2",
+				components:{
+					"my-component":{
+						template:
+						"<div>"+
+							"<slot name='slot1'></slot>"+
+							"<slot name='slot2'></slot>"+		
+						"</div>"
+					}
+				}
+			})
+		</script>
+		<p><b>综合案例：做一个即时贴（sticky）组件，用来显示一个有标题和主体的即时贴。具体的标题和内容，使用内容分发技术传入的HTML标签：</b></p>
+		<div class="" id="app3">
+			<sticky>
+				<div slot="title">
+					<h3>Title</h3>
+				</div>
+				<div slot="body">
+					<p>Body foo bar baz ddd</p>
+				</div>
+			</sticky>
+		</div>
+		<script>
+			new Vue({
+				el:"#app3",
+				components:{
+					"sticky":{
+						template:
+						'<div class="wrapper">'+
+							'<div class="title">'+
+								'<slot name="title"></slot>'+
+							'</div>'+
+							'<div class="body">'+
+								'<slot name="body"></slot>'+
+							'</div>'+
+						'</div>'
+					}
+				}
+			})
+		</script>
+		<p style="color:orange">
+			本案例，使用上下文通过属性slot创建了两个插槽，分别为title和body，在组件模板内（template成员）通过&lt;slot&gt;标签的name属性引用title和body，并把它注入且放到合适的位置上。
+		</p>
+	</body>
+</html>
