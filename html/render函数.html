@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>render函数</title>
+		<script src="https://unpkg.com/vue"></script>
+	</head>
+	<body>
+		<p style="color:orange">看下面这个例子:</p>
+		<div id="myDiv">
+			<child :level="2">Hello Wrold!</child>
+		</div>
+		<template id="template">
+			<div>
+				<h1 v-if="level===1">
+					<slot></slot>
+				</h1>
+				<h1 v-if="level===2">
+					<slot></slot>
+				</h1>
+				<h1 v-if="level===3">
+					<slot></slot>
+				</h1>
+				<h1 v-if="level===4">
+					<slot></slot>
+				</h1>
+				<h1 v-if="level===5">
+					<slot></slot>
+				</h1>
+				<h1 v-if="level===6">
+					<slot></slot>
+				</h1>
+			</div>
+		</template>
+		<script type="text/javascript">
+			var Child = Vue.extend({
+				template:'#template',
+				props:{
+					level:{
+						type:Number,
+						requried:true
+					}
+				}
+			})
+			new Vue({
+				el:"#myDiv",
+				components:{
+					'child':Child
+				}
+			})
+		</script>
+		<p style="color:orange">显然这种写法是繁冗复杂的，原因是虽然最后只剩下h2但是其他的h1,h3~h6其实都是被渲染了，只不过没有显示而已，为了优化我们需要引用Render。下面来看看如何将上面的代码改写为Render方式</p>
+		<div id="myDiv2">
+			<child2 :level="6">Hello Wrold!</child2>
+		</div>
+		<script type="text/javascript">
+			var Child2 = Vue.extend({
+				render:function(createElement){
+					return createElement(
+						'h' + this.level,//tag name标签名称
+						this.$slots.default//子组件中的阵列
+					)
+				},
+				props:{
+					level:{
+						type:Number,
+						required:true
+					}
+				}
+			})
+			new Vue({
+				el:"#myDiv2",
+				components:{
+					'child2':Child2
+				}
+			})
+		</script>
+		<p>解析：createElement看名字像动态创建dom节点（节点vue里面也叫VNode）的过程，再看内容，'h' + this.level根据level创建标签h1~h6,所以它只会渲染一个标签，而不是所有都渲染，所以优化了，而且代码也省了不少。</p>
+		<p style="color:orange">
+			createElemtent(tag,{},[])或者createElement(tag,{},String)类似，后面两个参数都是可选的
+		</p>
+		<script>
+			//@returns{VNode}
+			createElement(
+				//{String|Object|Function}
+				//一个HTML标签，组件设置，或一个函数
+				//必须Return上述其中一个
+				'div',
+				//{Object}
+				//一个对应属性的数据对象
+				//您可以在template中使用，可选项。
+				[
+					//（后续，将详细说明相关细节）
+				],
+				//{String | Array}
+				//子节点（VNode），可选项。
+				[
+					createElement('h1','hello world'),
+					createElement(myComponent,{
+						props:{
+							someProp:'foo'
+						}
+					}),
+					'bar'
+				]
+			)
+		</script>
+	</body>
+</html>
